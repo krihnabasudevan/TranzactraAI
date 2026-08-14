@@ -1,5 +1,5 @@
 import { Mail, Phone, MapPin, MessageSquare, Building2, Paperclip, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import PageHero from '../components/ui/PageHero';
 import Reveal from '../components/animations/Reveal';
 import Button from '../components/ui/Button';
@@ -12,12 +12,23 @@ export default function Contact() {
   }>({ type: null, message: '' });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setSubmitStatus({
+          type: 'error',
+          message: '❌ File size exceeds 5MB limit. Please choose a smaller file.',
+        });
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
       setSelectedFile(file);
       setFileName(file.name);
     }
@@ -26,6 +37,9 @@ export default function Contact() {
   const removeFile = () => {
     setSelectedFile(null);
     setFileName('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,7 +50,6 @@ export default function Contact() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    // Add file to form data if exists
     if (selectedFile) {
       formData.append('attachment', selectedFile);
     }
@@ -57,10 +70,14 @@ export default function Contact() {
         form.reset();
         setSelectedFile(null);
         setFileName('');
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       } else {
         throw new Error(result.error || 'Failed to send');
       }
     } catch (error) {
+      console.error('Form submission error:', error);
       setSubmitStatus({
         type: 'error',
         message: '❌ Failed to send. Please try again or use our contact details below.',
@@ -90,26 +107,21 @@ export default function Contact() {
             </div>
           </Reveal>
 
-          {/* Form and Contact Details - Side by Side */}
           <div className="grid lg:grid-cols-5 gap-8 max-w-6xl mx-auto">
-            {/* Form Section - Takes 3 columns but with more left margin */}
             <div className="lg:col-span-3 lg:pr-8">
               <Reveal>
-                {/* Status Message */}
                 {submitStatus.type && (
                   <div
-                    className={`mb-6 p-4 rounded-lg ${
-                      submitStatus.type === 'success'
+                    className={`mb-6 p-4 rounded-lg ${submitStatus.type === 'success'
                         ? 'bg-green-50 border border-green-200 text-green-700'
                         : 'bg-red-50 border border-red-200 text-red-700'
-                    }`}
+                      }`}
                   >
                     {submitStatus.message}
                   </div>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Name and Email - Grid */}
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-ink-700 mb-1">
@@ -139,7 +151,6 @@ export default function Contact() {
                     </div>
                   </div>
 
-                  {/* Company and Phone - Grid */}
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="company" className="block text-sm font-medium text-ink-700 mb-1">
@@ -167,7 +178,6 @@ export default function Contact() {
                     </div>
                   </div>
 
-                  {/* Subject */}
                   <div>
                     <label htmlFor="subject" className="block text-sm font-medium text-ink-700 mb-1">
                       Subject *
@@ -189,7 +199,6 @@ export default function Contact() {
                     </select>
                   </div>
 
-                  {/* Message */}
                   <div>
                     <label htmlFor="message" className="block text-sm font-medium text-ink-700 mb-1">
                       Your Message *
@@ -204,7 +213,6 @@ export default function Contact() {
                     />
                   </div>
 
-                  {/* File Upload */}
                   <div>
                     <label className="block text-sm font-medium text-ink-700 mb-1">
                       Attach File (Optional)
@@ -214,6 +222,7 @@ export default function Contact() {
                         type="file"
                         id="file-upload"
                         name="attachment"
+                        ref={fileInputRef}
                         onChange={handleFileChange}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
@@ -245,7 +254,6 @@ export default function Contact() {
                     )}
                   </div>
 
-                  {/* Submit Button */}
                   <div className="text-center pt-2">
                     {isSubmitting ? (
                       <Button
@@ -271,7 +279,6 @@ export default function Contact() {
               </Reveal>
             </div>
 
-            {/* Contact Details - Takes 2 columns with increased width */}
             <div className="lg:col-span-2 lg:pl-4">
               <div className="space-y-4">
                 {[
@@ -307,7 +314,6 @@ export default function Contact() {
                   </Reveal>
                 ))}
 
-                {/* Enterprise Sales */}
                 <Reveal delay={0.2}>
                   <div className="p-6 rounded-2xl bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-100">
                     <div className="flex items-center gap-2 mb-3">
