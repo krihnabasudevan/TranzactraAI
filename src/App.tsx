@@ -29,6 +29,7 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
+import PaymentOrchestration from './pages/PaymentOrchestration';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
               <Route path="/solutions" element={<Solutions />} />
               <Route path="/payment-gateway" element={<PaymentGateway />} />
               <Route path="/merchant-solutions" element={<MerchantSolutions />} />
+              <Route path="/payment-orchestration" element={<PaymentOrchestration />} />
               <Route path="/routing" element={<Routing />} />
               <Route path="/payouts" element={<Payouts />} />
               <Route path="/settlement" element={<Settlement />} />
@@ -65,6 +67,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="*" element={<Home />} />
+              
             </Routes>
           </main>
           <Footer />

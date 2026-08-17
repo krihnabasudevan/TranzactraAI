@@ -23,6 +23,7 @@ export const navLinks: NavItem[] = [
     children: [
       { label: 'Payment Gateway', href: '/payment-gateway' },
       { label: 'Merchant Solutions', href: '/merchant-solutions' },
+      { label: 'Payment Orchestration', href: '/payment-orchestration' },
       { label: 'Routing', href: '/routing' },
       { label: 'Payouts', href: '/payouts' },
       { label: 'Settlement', href: '/settlement' },
